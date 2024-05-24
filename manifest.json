@@ -20,12 +20,18 @@
       "128": "icons/v2/icon128.png"
     },
     "permissions": [
+      "activeTab",
       "contextMenus",
       "storage"
     ],
+    "host_permissions": [
+      "https://www.pokemon.com/*",
+      "https://asia.pokemon-card.com/*",
+      "https://www.pokemon-card.com/*"
+    ],
     "content_scripts": [
       {
-        "matches": ["<all_urls>"],
+        "matches": ["https://www.pokemon.com/*", "https://asia.pokemon-card.com/*", "https://www.pokemon-card.com/*"],
         "js": ["content.js"]
       }
     ]
