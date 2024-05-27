@@ -35,5 +35,5 @@
         "js": ["content.js"]
       }
     ],
-    "default_locale": "zh"
+    "default_locale": "en"
   }
