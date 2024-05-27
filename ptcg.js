@@ -1,4 +1,23 @@
 window.jsPDF = window.jspdf.jsPDF
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to apply i18n translations
+  function applyTranslations() {
+      const elements = document.querySelectorAll('[data-i18n]');
+      elements.forEach(function(element) {
+          const messageKey = element.getAttribute('data-i18n');
+          const message = chrome.i18n.getMessage(messageKey);
+          if (message) {
+              element.textContent = message;
+          }
+      });
+  }
+
+  // Apply translations
+  applyTranslations();
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
   const imageList = document.getElementById('imageList');
   const clearAllButton = document.getElementById('clearAll');
@@ -43,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'remove';
+      deleteButton.textContent = chrome.i18n.getMessage("remove_card");
       deleteButton.id = 'deleteButton'
       deleteButton.style.marginLeft = '10px';
       deleteButton.addEventListener('click', () => {

@@ -34,5 +34,6 @@
         "matches": ["https://www.pokemon.com/*", "https://asia.pokemon-card.com/*", "https://www.pokemon-card.com/*"],
         "js": ["content.js"]
       }
-    ]
+    ],
+    "default_locale": "zh"
   }

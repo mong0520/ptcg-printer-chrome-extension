@@ -1,0 +1,26 @@
+{
+    "export_to_pdf": {
+        "message": "Export PDF",
+        "description": ""
+    },
+    "export_to_csv": {
+        "message": "Export CSV",
+        "description": ""
+    },
+    "clean_all": {
+        "message": "Clean All cards",
+        "description": ""
+    },
+    "add_to_collection": {
+        "message": "Add to PTCG collection",
+        "description": ""
+    },
+    "count_to_add": {
+        "message": "Count: ",
+        "description": ""
+    },
+    "remove_card": {
+        "message": "Remove",
+        "description": ""
+    }
+}

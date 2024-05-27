@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
       id: "bookmarkImage",
-      title: "Add to PTCG collection",
+      title: chrome.i18n.getMessage("add_to_collection"),
       contexts: ["image"]
     });
   });

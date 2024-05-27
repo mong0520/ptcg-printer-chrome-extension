@@ -1,0 +1,26 @@
+{
+    "export_to_pdf": {
+        "message": "輸出 PDF",
+        "description": ""
+    },
+    "export_to_csv": {
+        "message": "輸出 CSV",
+        "description": ""
+    },
+    "clean_all": {
+        "message": "清除所有卡片",
+        "description": ""
+    },
+    "add_to_collection": {
+        "message": "加入 PTCG 收藏",
+        "description": ""
+    },
+    "count_to_add": {
+        "message": "數量: ",
+        "description": ""
+    },
+    "remove_card": {
+        "message": "移除",
+        "description": ""
+    }
+}
