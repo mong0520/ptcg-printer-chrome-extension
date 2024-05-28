@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.sync.get({ images: [] }, (data) => {
       const images = data.images;
       const doc = new jsPDF('p', 'cm', 'A4');
-      let xPos = 0.5;
-      let yPos = 0.5;
+      let xPos = 1;
+      let yPos = 1;
       var totalImages = 0;
       var blankPage = true;
       images.forEach((imageInfo, index) => {
@@ -115,15 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
             blankPage = false;
             xPos += imgWidth;
-            if (xPos >= 20) {
-              xPos = 0.5;
+            if (xPos >= 18) {
+              xPos = 1;
               yPos += imgHeight;
             }
             if (yPos >= 20) {
               doc.addPage();
               blankPage = true;
-              xPos = 0.5;
-              yPos = 0.5;
+              xPos = 1;
+              yPos = 1;
             }
           }
           if (index === images.length - 1) {

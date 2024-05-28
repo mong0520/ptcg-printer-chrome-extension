@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Pokémon Trading Card Game(PTCG) printer",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Create your handmade PTCG card in one click",
     "background": {
       "service_worker": "background.js"
