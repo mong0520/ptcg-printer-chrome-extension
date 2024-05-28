@@ -101,8 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const img = new Image();
         img.src = imageInfo.url;
         img.onload = function() {
-          const newWidth = 6.58;
-          const newHeight = 9.18;
+          // for 7-11 ibon
+          // const newWidth = 6.58;
+          // const newHeight = 9.18;
+
+          const newWidth = 6.3;
+          const newHeight = 8.8;
 
           const imgWidth = newWidth;
           const imgHeight = newHeight;
