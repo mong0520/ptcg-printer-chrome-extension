@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearAllButton = document.getElementById('clearAll');
   const exportPdfButton = document.getElementById('exportPdf');
   const exportCsvButton = document.getElementById('exportCsv');
+  const sizeSelect = document.getElementById('sizeSelect');
 
 
   chrome.storage.sync.get({ images: [] }, (data) => {
@@ -101,12 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const img = new Image();
         img.src = imageInfo.url;
         img.onload = function() {
-          // for 7-11 ibon
-          // const newWidth = 6.58;
-          // const newHeight = 9.18;
-
-          const newWidth = 6.3;
-          const newHeight = 8.8;
+        const selectedSize = sizeSelect.value;
+        let newWidth, newHeight;
+        if (selectedSize === 'standard') {
+          newWidth = 6.3;
+          newHeight = 8.8;
+        } else if (selectedSize === 'ibon') {
+          newWidth = 6.58;
+          newHeight = 9.18;
+        }
 
           const imgWidth = newWidth;
           const imgHeight = newHeight;

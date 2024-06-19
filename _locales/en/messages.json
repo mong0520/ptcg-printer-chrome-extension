@@ -22,5 +22,17 @@
     "remove_card": {
         "message": "Remove",
         "description": ""
+    },
+    "select_size": {
+        "message": "Select size",
+        "description": ""
+    },
+    "standard_size": {
+        "message": "Standard Size(100%)",
+        "description": ""
+    },
+    "special_size": {
+        "message": "7-11 ibon Size",
+        "description": ""
     }
 }

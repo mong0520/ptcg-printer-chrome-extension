@@ -22,5 +22,17 @@
     "remove_card": {
         "message": "移除",
         "description": ""
+    },
+    "select_size": {
+        "message": "選擇大小",
+        "description": ""
+    },
+    "standard_size": {
+        "message": "標準大小",
+        "description": ""
+    },
+    "special_size": {
+        "message": "7-11 ibon 大小",
+        "description": ""
     }
 }
