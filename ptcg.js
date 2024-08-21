@@ -117,6 +117,18 @@ document.addEventListener('DOMContentLoaded', () => {
           for (let i = 0; i < imageInfo.quantity; i++) {
             totalImages ++;
             doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+            doc.setLineWidth(0.01);
+            // horizontal lines
+            for (let i = 0; i < 4; i++) {
+              const yPos = 1 + newHeight * i;
+              doc.line(0, yPos, 100, yPos);
+            }
+
+            // vertical lines
+            for (let j = 0; j < 4; j++) {
+              const xPos = 1 + newWidth * j;
+              doc.line(xPos, 0, xPos, 100);
+            }
             blankPage = false;
             xPos += imgWidth;
             if (xPos >= 18) {
