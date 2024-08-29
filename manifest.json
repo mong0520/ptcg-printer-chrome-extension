@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Pokémon Trading Card Game(PTCG) printer",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "Create your handmade PTCG card in one click",
     "background": {
       "service_worker": "background.js"
@@ -27,11 +27,13 @@
     "host_permissions": [
       "https://www.pokemon.com/*",
       "https://asia.pokemon-card.com/*",
-      "https://www.pokemon-card.com/*"
+      "https://www.pokemon-card.com/*",
+      "https://limitlesstcg.com/*",
+      "https://limitlesstcg.nyc3.digitaloceanspaces.com/*"
     ],
     "content_scripts": [
       {
-        "matches": ["https://www.pokemon.com/*", "https://asia.pokemon-card.com/*", "https://www.pokemon-card.com/*"],
+        "matches": ["https://www.pokemon.com/*", "https://asia.pokemon-card.com/*", "https://www.pokemon-card.com/*", "file://*", "https://limitlesstcg.com/*"],
         "js": ["content.js"]
       }
     ],
