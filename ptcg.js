@@ -118,6 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
             totalImages ++;
             doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
             doc.setLineWidth(0.01);
+            doc.setLineDashPattern([0.1, 0.1], 0);
+            doc.setDrawColor(200, 200, 200);
             // horizontal lines
             for (let i = 0; i < 4; i++) {
               const yPos = 1 + newHeight * i;
