@@ -92,69 +92,99 @@ document.addEventListener('DOMContentLoaded', () => {
 
   exportPdfButton.addEventListener('click', () => {
     chrome.storage.sync.get({ images: [] }, (data) => {
-      const images = data.images;
-      const doc = new jsPDF('p', 'cm', 'A4');
-      let xPos = 1;
-      let yPos = 1;
-      var totalImages = 0;
-      var blankPage = true;
-      images.forEach((imageInfo, index) => {
-        const img = new Image();
-        img.src = imageInfo.url;
-        img.onload = function() {
-        const selectedSize = sizeSelect.value;
-        let newWidth, newHeight;
-        if (selectedSize === 'standard') {
-          newWidth = 6.3;
-          newHeight = 8.8;
-        } else if (selectedSize === 'ibon') {
-          newWidth = 6.58;
-          newHeight = 9.18;
-        }
+        const images = data.images;
+        const doc = new jsPDF('p', 'cm', 'A4');
+        let xPos = 1;
+        let yPos = 1;
+        let totalImages = 0;
+        let blankPage = true;
 
-          const imgWidth = newWidth;
-          const imgHeight = newHeight;
-          for (let i = 0; i < imageInfo.quantity; i++) {
-            totalImages ++;
-            doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
-            doc.setLineWidth(0.01);
-            doc.setLineDashPattern([0.1, 0.1], 0);
-            doc.setDrawColor(200, 200, 200);
-            // horizontal lines
-            for (let i = 0; i < 4; i++) {
-              const yPos = 1 + newHeight * i;
-              doc.line(0, yPos, 100, yPos);
-            }
+        // 加載浮水印圖片
+        const watermarkImg = new Image();
+        watermarkImg.src = 'icons/proxy.png'; // 替換為浮水印圖片的URL或路徑
+        watermarkImg.crossOrigin = "Anonymous"; // 如果浮水印圖片來自不同來源，可能需要設置跨域
 
-            // vertical lines
-            for (let j = 0; j < 4; j++) {
-              const xPos = 1 + newWidth * j;
-              doc.line(xPos, 0, xPos, 100);
-            }
-            blankPage = false;
-            xPos += imgWidth;
-            if (xPos >= 18) {
-              xPos = 1;
-              yPos += imgHeight;
-            }
-            if (yPos >= 20) {
-              doc.addPage();
-              blankPage = true;
-              xPos = 1;
-              yPos = 1;
-            }
-          }
-          if (index === images.length - 1) {
-            if (blankPage == true) {
-                var pageCount = doc.internal.getNumberOfPages();
-                doc.deletePage(pageCount);
-            }
-            doc.save("ptcg.pdf");
-          }
-        }
-      });
+        watermarkImg.onload = function () {
+            images.forEach((imageInfo, index) => {
+                const img = new Image();
+                img.src = imageInfo.url;
+                img.crossOrigin = "Anonymous"; // 如果圖片來自不同來源，可能需要設置跨域
+                img.onload = function () {
+                    const selectedSize = sizeSelect.value;
+                    let newWidth, newHeight;
+                    if (selectedSize === 'standard') {
+                        newWidth = 6.3;
+                        newHeight = 8.8;
+                    } else if (selectedSize === 'ibon') {
+                        newWidth = 6.58;
+                        newHeight = 9.18;
+                    }
+
+                    const imgWidth = newWidth;
+                    const imgHeight = newHeight;
+                    for (let i = 0; i < imageInfo.quantity; i++) {
+                        totalImages++;
+                        doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+                        doc.setGState(new doc.GState({ opacity: 0.6 }));
+
+                        // 添加浮水印圖片
+                        const watermarkWidth = 0.5; // 設置浮水印圖片寬度
+                        const watermarkHeight = 0.5; // 設置浮水印圖片高度
+                        // 計算浮水印圖片的位置：右下角，考慮內邊距
+                        const padding = 0.3; // 浮水印距離圖片邊緣的距離（以厘米為單位）
+                        const watermarkX = xPos + imgWidth - watermarkWidth - (padding*2);
+                        const watermarkY = yPos + imgHeight - watermarkHeight - padding;
+                        doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                        // 恢復不透明度，防止影響後續的內容
+                        doc.setGState(new doc.GState({ opacity: 1 }));
+
+                        // 繪製網格線（如果需要）
+                        doc.setLineWidth(0.01);
+                        doc.setLineDashPattern([0.1, 0.1], 0);
+                        doc.setDrawColor(200, 200, 200);
+                        for (let line = 0; line < 4; line++) {
+                            const yPosLine = 1 + newHeight * line;
+                            doc.line(0, yPosLine, 100, yPosLine);
+                        }
+                        for (let line = 0; line < 4; line++) {
+                            const xPosLine = 1 + newWidth * line;
+                            doc.line(xPosLine, 0, xPosLine, 100);
+                        }
+
+                        xPos += imgWidth;
+                        if (xPos >= 18) { // 根據A4尺寸調整頁面邊界
+                            xPos = 1;
+                            yPos += imgHeight;
+                        }
+                        if (yPos >= 20) { // 根據A4尺寸調整頁面邊界
+                            doc.addPage();
+                            blankPage = true;
+                            xPos = 1;
+                            yPos = 1;
+                        }
+                    }
+                    blankPage = false;
+                    if (index === images.length - 1) {
+                        if (blankPage === true) {
+                            const pageCount = doc.internal.getNumberOfPages();
+                            doc.deletePage(pageCount);
+                        }
+                        doc.save("ptcg.pdf");
+                    }
+                };
+                img.onerror = function () {
+                    console.error(`Failed to load image: ${imageInfo.url}`);
+                    // 處理圖片加載錯誤（例如，跳過這張圖片或顯示錯誤信息）
+                };
+            });
+        };
+        watermarkImg.onerror = function () {
+            console.error("Failed to load watermark image.");
+        };
     });
-  });
+});
+
+
   exportCsvButton.addEventListener('click', () => {
     chrome.storage.sync.get({ images: [] }, (data) => {
       const images = data.images;

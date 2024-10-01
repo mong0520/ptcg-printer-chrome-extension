@@ -3,7 +3,7 @@ EXTENSION_NAME = ptct-printer-chrome-extension
 
 ZIP_FILE = $(EXTENSION_NAME).zip
 
-FILES = *.json *.js *.html *.css js/* icons/* _locales/*
+FILES = *.json *.js *.html *.css js/* icons/* _locales/* *.png
 
 all: clean
 	mkdir dist
