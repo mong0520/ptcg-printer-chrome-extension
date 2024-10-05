@@ -91,96 +91,112 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   exportPdfButton.addEventListener('click', () => {
-    chrome.storage.sync.get({ images: [] }, (data) => {
+    chrome.storage.sync.get({ images: [] }, async (data) => {
         const images = data.images;
         const doc = new jsPDF('p', 'cm', 'A4');
         let xPos = 1;
         let yPos = 1;
         let totalImages = 0;
-        let blankPage = true;
+        let currentPageHasContent = false; // 用來追蹤當前頁面是否有內容
 
         // 加載浮水印圖片
         const watermarkImg = new Image();
-        watermarkImg.src = 'icons/proxy.png'; // 替換為浮水印圖片的URL或路徑
-        watermarkImg.crossOrigin = "Anonymous"; // 如果浮水印圖片來自不同來源，可能需要設置跨域
+        watermarkImg.src = 'icons/proxy.png';
+        watermarkImg.crossOrigin = "Anonymous";
 
-        watermarkImg.onload = function () {
-            images.forEach((imageInfo, index) => {
+        try {
+            await new Promise((resolve, reject) => {
+                watermarkImg.onload = resolve;
+                watermarkImg.onerror = reject;
+            });
+        } catch (error) {
+            console.error("Failed to load watermark image.");
+            return;
+        }
+
+        const loadImage = (imageInfo) => {
+            return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.src = imageInfo.url;
-                img.crossOrigin = "Anonymous"; // 如果圖片來自不同來源，可能需要設置跨域
-                img.onload = function () {
-                    const selectedSize = sizeSelect.value;
-                    let newWidth, newHeight;
-                    if (selectedSize === 'standard') {
-                        newWidth = 6.3;
-                        newHeight = 8.8;
-                    } else if (selectedSize === 'ibon') {
-                        newWidth = 6.58;
-                        newHeight = 9.18;
-                    }
-
-                    const imgWidth = newWidth;
-                    const imgHeight = newHeight;
-                    for (let i = 0; i < imageInfo.quantity; i++) {
-                        totalImages++;
-                        doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
-                        doc.setGState(new doc.GState({ opacity: 0.6 }));
-
-                        // 添加浮水印圖片
-                        const watermarkWidth = 0.5; // 設置浮水印圖片寬度
-                        const watermarkHeight = 0.5; // 設置浮水印圖片高度
-                        // 計算浮水印圖片的位置：右下角，考慮內邊距
-                        const padding = 0.3; // 浮水印距離圖片邊緣的距離（以厘米為單位）
-                        const watermarkX = xPos + imgWidth - watermarkWidth - (padding*2);
-                        const watermarkY = yPos + imgHeight - watermarkHeight - padding;
-                        doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
-                        // 恢復不透明度，防止影響後續的內容
-                        doc.setGState(new doc.GState({ opacity: 1 }));
-
-                        // 繪製網格線（如果需要）
-                        doc.setLineWidth(0.01);
-                        doc.setLineDashPattern([0.1, 0.1], 0);
-                        doc.setDrawColor(200, 200, 200);
-                        for (let line = 0; line < 4; line++) {
-                            const yPosLine = 1 + newHeight * line;
-                            doc.line(0, yPosLine, 100, yPosLine);
-                        }
-                        for (let line = 0; line < 4; line++) {
-                            const xPosLine = 1 + newWidth * line;
-                            doc.line(xPosLine, 0, xPosLine, 100);
-                        }
-
-                        xPos += imgWidth;
-                        if (xPos >= 18) { // 根據A4尺寸調整頁面邊界
-                            xPos = 1;
-                            yPos += imgHeight;
-                        }
-                        if (yPos >= 20) { // 根據A4尺寸調整頁面邊界
-                            doc.addPage();
-                            blankPage = true;
-                            xPos = 1;
-                            yPos = 1;
-                        }
-                    }
-                    blankPage = false;
-                    if (index === images.length - 1) {
-                        if (blankPage === true) {
-                            const pageCount = doc.internal.getNumberOfPages();
-                            doc.deletePage(pageCount);
-                        }
-                        doc.save("ptcg.pdf");
-                    }
-                };
-                img.onerror = function () {
+                img.crossOrigin = "Anonymous";
+                img.onload = () => resolve({ img, imageInfo });
+                img.onerror = () => {
                     console.error(`Failed to load image: ${imageInfo.url}`);
-                    // 處理圖片加載錯誤（例如，跳過這張圖片或顯示錯誤信息）
+                    resolve(null); // 略過加載失敗的圖片，而不中斷整個流程
                 };
             });
         };
-        watermarkImg.onerror = function () {
-            console.error("Failed to load watermark image.");
-        };
+
+        const loadedImages = await Promise.all(images.map(loadImage));
+        loadedImages.forEach((loadedImage) => {
+            if (!loadedImage) return; // 跳過未能加載的圖片
+
+            const { img, imageInfo } = loadedImage;
+            const selectedSize = sizeSelect.value;
+            let newWidth, newHeight;
+
+            if (selectedSize === 'standard') {
+                newWidth = 6.3;
+                newHeight = 8.8;
+            } else if (selectedSize === 'ibon') {
+                newWidth = 6.58;
+                newHeight = 9.18;
+            }
+
+            const imgWidth = newWidth;
+            const imgHeight = newHeight;
+
+            for (let i = 0; i < imageInfo.quantity; i++) {
+                totalImages++;
+                doc.addImage(img, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+                currentPageHasContent = true; // 當有圖片添加時，標記當前頁面有內容
+                doc.setGState(new doc.GState({ opacity: 0.8 }));
+
+                // 添加浮水印圖片
+                const watermarkWidth = 0.5;
+                const watermarkHeight = 0.5;
+                const x_padding = 0.5;
+                const y_padding = 1.2;
+                const watermarkX = xPos + imgWidth - watermarkWidth - x_padding;
+                const watermarkY = yPos + imgHeight - watermarkHeight - y_padding;
+
+                doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
+                doc.setGState(new doc.GState({ opacity: 1 }));
+
+                // 繪製網格線
+                doc.setLineWidth(0.01);
+                doc.setLineDashPattern([0.1, 0.1], 0);
+                doc.setDrawColor(200, 200, 200);
+                for (let line = 0; line < 4; line++) {
+                    const yPosLine = 1 + newHeight * line;
+                    doc.line(0, yPosLine, 100, yPosLine);
+                }
+                for (let line = 0; line < 4; line++) {
+                    const xPosLine = 1 + newWidth * line;
+                    doc.line(xPosLine, 0, xPosLine, 100);
+                }
+
+                xPos += imgWidth;
+                if (xPos >= 18) { // 根據A4尺寸調整頁面邊界
+                    xPos = 1;
+                    yPos += imgHeight;
+                }
+                if (yPos >= 20) { // 根據A4尺寸調整頁面邊界
+                    doc.addPage();
+                    currentPageHasContent = false; // 新的一頁開始時，重置內容標記
+                    xPos = 1;
+                    yPos = 1;
+                }
+            }
+        });
+
+        // 檢查最後一頁是否為空白頁
+        if (!currentPageHasContent) {
+            const pageCount = doc.internal.getNumberOfPages();
+            doc.deletePage(pageCount); // 如果當前頁面沒有內容，刪除最後一頁
+        }
+
+        doc.save("ptcg.pdf");
     });
 });
 
