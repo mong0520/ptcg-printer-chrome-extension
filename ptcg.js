@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         watermarkImg.onload = function () {
             images.forEach((imageInfo, index) => {
                 const img = new Image();
+                console.log(img.src)
                 img.src = imageInfo.url;
                 img.crossOrigin = "Anonymous"; // 如果圖片來自不同來源，可能需要設置跨域
                 img.onload = function () {
@@ -125,15 +126,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (let i = 0; i < imageInfo.quantity; i++) {
                         totalImages++;
                         doc.addImage(this, 'JPEG', xPos, yPos, imgWidth, imgHeight);
-                        doc.setGState(new doc.GState({ opacity: 0.6 }));
+                        doc.setGState(new doc.GState({ opacity: 0.8 }));
 
                         // 添加浮水印圖片
                         const watermarkWidth = 0.5; // 設置浮水印圖片寬度
                         const watermarkHeight = 0.5; // 設置浮水印圖片高度
                         // 計算浮水印圖片的位置：右下角，考慮內邊距
-                        const padding = 0.3; // 浮水印距離圖片邊緣的距離（以厘米為單位）
-                        const watermarkX = xPos + imgWidth - watermarkWidth - (padding*2);
-                        const watermarkY = yPos + imgHeight - watermarkHeight - padding;
+                        const x_padding = 0.5; // 浮水印距離圖片邊緣的距離（以厘米為單位）
+                        const y_padding = 1.2; // 浮水印距離圖片邊緣的距離（以厘米為單位）
+                        const watermarkX = xPos + imgWidth - watermarkWidth - x_padding
+                        const watermarkY = yPos + imgHeight - watermarkHeight - y_padding;
                         doc.addImage(watermarkImg, 'PNG', watermarkX, watermarkY, watermarkWidth, watermarkHeight);
                         // 恢復不透明度，防止影響後續的內容
                         doc.setGState(new doc.GState({ opacity: 1 }));
