@@ -33,7 +33,7 @@
     ],
     "content_scripts": [
       {
-        "matches": ["https://www.pokemon.com/*", "https://asia.pokemon-card.com/*", "https://www.pokemon-card.com/*", "file://*", "https://limitlesstcg.com/*"],
+        "matches": ["https://www.pokemon.com/*", "https://asia.pokemon-card.com/*", "https://www.pokemon-card.com/*", "file://*", "https://limitlesstcg.com/*", "https://www.nt1.dev/*"],
         "js": ["content.js"]
       }
     ],
